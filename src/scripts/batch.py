@@ -1,7 +1,7 @@
 import scipy.io.wavfile
 from scipy.fftpack import dct
 import matplotlib.pyplot as plt
-import librosa 
+import librosa
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
 from os import listdir
@@ -23,7 +23,7 @@ cep_lifter = 22
 def instance(path, label):
     # Setup
     # File assumed to be in the same directory
-    sample_rate, signal = scipy.io.wavfile.read(path)  
+    sample_rate, signal = scipy.io.wavfile.read(path)
     # Pre-Emphasis:
     emphasized_signal = numpy.append(signal[0], signal[1:] - pre_emphasis * signal[:-1])
     # Framing:
@@ -35,7 +35,7 @@ def instance(path, label):
     pad_signal_length = num_frames * frame_step + frame_length
     z = numpy.zeros((pad_signal_length - signal_length))
     # Pad Signal to make sure that all frames have equal number of samples without truncating any samples from the original signal
-    pad_signal = numpy.append(emphasized_signal, z) 
+    pad_signal = numpy.append(emphasized_signal, z)
     indices = numpy.tile(numpy.arange(0, frame_length), (num_frames, 1)) + numpy.tile(numpy.arange(0, num_frames * frame_step, frame_step), (frame_length, 1)).T
     frames = pad_signal[indices.astype(numpy.int32, copy=False)]
     # Window:
@@ -67,15 +67,15 @@ def instance(path, label):
     (nframes, ncoeff) = mfcc.shape
     n = numpy.arange(ncoeff)
     lift = 1 + (cep_lifter / 2) * numpy.sin(numpy.pi * n / cep_lifter)
-    mfcc *= lift  
+    mfcc *= lift
     filter_banks -= (numpy.mean(filter_banks, axis=0) + 1e-8)
     mfcc -= (numpy.mean(mfcc, axis=0) + 1e-8)
-    return [mfcc, label] 
+    return [mfcc, label]
 
 def batch(db, csv): # Return a audio batch proccesed to be a RNN input implemented in Keras.
     # A folder path should be specified. There must be the wav files.
     # We only want wav files.
-    instances = [os.path.basename(x) for x in glob.glob(db + '/*.wav')] 
+    instances = [os.path.basename(x) for x in glob.glob(db + '/*.wav')]
     dictionary = pd.read_csv(csv, sep=';')
     tmp = []
     x = []

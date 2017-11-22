@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: iso-8859-1 -*-
-import serial, sys, re, binascii 
+import serial, sys, re, binascii
 import serial.tools.list_ports
 
 def getSerialPort():
@@ -16,11 +16,11 @@ def getSerialPort():
     usable = []
     for i in list:
         enable.append(i.device)
-    for i in filter(r.match, enable): 
+    for i in filter(r.match, enable):
         usable.append(i)
     return usable[0]
-        
-print (getSerialPort())     
+
+print (getSerialPort())
 arduino = serial.Serial(getSerialPort(), 9600)
 option = "1"
 while(option != "0" ):

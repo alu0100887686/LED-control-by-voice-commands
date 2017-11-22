@@ -3,16 +3,18 @@ from keras.layers import Dense
 import numpy as np
 import batch # some methods to procces audio batchs
 
-INPUT_DIM = 8
-INPUT_LAYER_SIZE = 8
-HIDDEN_LAYER_SIZE = 12
-OUTPUT_LAYER_SIZE = 8
+INPUT_DIM = 40
+INPUT_LAYER_SIZE = 597
+HIDDEN_LAYER_SIZE = 1024
+OUTPUT_LAYER_SIZE = 1
 INPUT_LAYER_ACTIVATION = 'relu'
 HIDDEN_LAYER_ACTIVATION = 'relu'
-OUTPUT_LAYER_ACTIVATION = 'sigmoid'
+OUTPUT_LAYER_ACTIVATION = 'relu'
+EPOCHS = 150
+
 
 # fix random seed for reproducibility
-np.random.seed(7)  
+np.random.seed(7)
 
 def build_from_scratch():
     # create model
@@ -27,14 +29,14 @@ def evaluate(model, validation_set_path = "../../data/validation_set", dictionar
     # evaluate the model
     scores = model.evaluate(x, y, batch_size=len(x))
     print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
-    
+
 def training(training_set_path = "../../data/training_set", dictionary_path = "../../data/dictionary.csv"):
     model = build_from_scratch()
     x, y = batch(training_set_path, dictionary_path)
     # Compile model
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
     # Fit the model
-    model.fit(x, y, epochs=150, batch_size=len(x))
+    model.fit(x, y, epochs=EPOCHS, batch_size=len(x))
     evaluate(model)
     return model
 
