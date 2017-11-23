@@ -7,20 +7,32 @@ FORMAT = pyaudio.paInt16
 CHANNELS = 2
 RATE = 44100
 RECORD_SECONDS = 3
+from datetime import datetime
 
-n_recording = 1
+#n_recording = 1
 
+path = os.path.dirname(__file__)
+training_set_path = path + '/../../data/training_set'
+validation_set_path = path + '/../../data/validation_set'
+dictionary_path = path + '/../../data/dictionary.csv'
+folder_destination = -1
+
+while(folder_destination != 0 and folder_destination != 1):
+    print("Folder files output (0 -> training set, 1 -> validation_set):")
+    folder_destination = int(input())
 print("Enter File Prefix: ")
 filename = input()
 print("Enter Recording Class: ")
 type = input()
 
 csv = ""
-os.mkdir("wav")
+#os.mkdir("wav")
 
 while(True):
-
-    file = "wav/" + filename + str(n_recording) + ".wav"
+    if(folder_destination == 0):
+        file = training_set_path + "/" + filename + datetime.now().strftime('%Y-%m-%d_%H-%M-%S') + ".wav"
+    else:
+        file = validation_set_path + "/" + filename + datetime.now().strftime('%Y-%m-%d_%H-%M-%S') + ".wav"
     csv += filename + str(n_recording) + ".wav" + ";" + str(type) + "\n"
     n_recording += 1
 
@@ -60,7 +72,6 @@ while(True):
     if aux == 'q':
         break;
 
-f=open("TrainingFiles.csv", "a+")
+f=open(dictionary_path, "a+")
 f.write(csv)
 f.close()
-

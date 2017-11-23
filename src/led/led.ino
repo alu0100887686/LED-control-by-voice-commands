@@ -1,4 +1,4 @@
-/* Voice commands to control a RGB LED: This is a LED monitor Agent to be managed 
+/* Voice commands to control a RGB LED: This is a LED monitor Agent to be managed
  * from the Deep Learning Agent (Speech Recognition) written in Python.
  *
  * Created by: Abián Torres Torres
@@ -9,17 +9,17 @@
  * 1. Turn On
  * 2. Turn Off
  * 3. Switch Random Color
- * 4. Color Blink 
+ * 4. Color Blink
  * 5. Normal Blink
  * 6. Decrease Swap Frecuency
  * 7. Increase Swap Frecuency */
  
-// LED: 
+// LED:
 # define LED_RED_PIN 5 // LED connected to digital output pin 9 for red color.
 # define LED_GREEN_PIN 7 // LED connected to digital output pin 9 for green color.
 # define LED_BLUE_PIN 6 // LED connected to digital output pin 9 for blue color.
-# define LED_MAX_VALUE 255 // Maximun value for LED. 
-# define LED_MIN_VALUE 0 // Minimum value for LED. 
+# define LED_MAX_VALUE 255 // Maximun value for LED.
+# define LED_MIN_VALUE 0 // Minimum value for LED.
 # define LED_SWAP_FRECUENCY_RATIO 100 // Value with which be used to modified the fading frecuency.
 # define MAXIMUM_SWAP_FRECUENCY_RATIO 30000 // Value with which be used to modified the fading frecuency.
 // Colors:
@@ -36,10 +36,10 @@ const int COLORS[NUMBER_OF_COLORS][RGB_DIMENSION] = {{255, 255, 255}, {0, 0, 255
 // Transmission with computer:
 # define TRANSMISSION_BAUD 9600
 
-// LED: 
+// LED:
 int currentLedSwapFrecuency = LED_SWAP_FRECUENCY_RATIO * 5; // Value with will determinate the current fading frecuency of the LED.
 // Colors:
-int currentLedColor = WHITE; // Current LED color. 
+int currentLedColor = WHITE; // Current LED color.
 int randomColor[2] = {RED, WHITE}; // Temporal variable wich allows to get a random color in two sets excluding current LED color.
 // Auxiliar variables for command selection:
 int prevCommand = 0;
@@ -106,7 +106,7 @@ void rules() {
       nextCommand = 0; // Avoid loops.
       prevCommand = 0;
       break;
-    case 4: // Color Blink 
+    case 4: // Color Blink
       delay(currentLedSwapFrecuency);
       switchRandomColor(); // Allows loops.
       break;

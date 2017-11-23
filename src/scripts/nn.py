@@ -1,61 +1,73 @@
+#!/usr/bin/python
 from keras.models import Sequential
 from keras.layers import Dense
+from keras.layers import Flatten
+from keras.layers import LSTM
+from keras.layers import Dropout
+from keras import optimizers
 import numpy as np
 import batch # some methods to procces audio batchs
+import time
+import h5py
+import sys, os
 
-INPUT_DIM = 40
-INPUT_LAYER_SIZE = 597
-HIDDEN_LAYER_SIZE = 1024
-OUTPUT_LAYER_SIZE = 1
-INPUT_LAYER_ACTIVATION = 'relu'
-HIDDEN_LAYER_ACTIVATION = 'relu'
-OUTPUT_LAYER_ACTIVATION = 'relu'
-EPOCHS = 150
+units_first_layer = 1024
+units_second_layer = 1024
+units_third_layer = 1024
+classes = 2
+epochs = 25
+path = os.path.dirname(__file__)
+training_set_path = path + '/../../data/training_set'
+validation_set_path = path + '/../../data/validation_set'
+dictionary_path = path + '/../../data/dictionary.csv'
+json_path = path + '/../../data/model/model.json'
+h5_path = path + '/../../data/model/weights.h5'
 
-
-# fix random seed for reproducibility
-np.random.seed(7)
-
-def build_from_scratch():
+def generate_model(training_set_path = training_set_path, validation_set_path = training_set_path,
+ dictionary_path = dictionary_path, json_path = json_path, h5_path = h5_path):
+    # fix random seed for reproducibility
+    np.random.seed(int(time.time()))
+    # get training batch
+    x_t, y_t = batch.batch(training_set_path, dictionary_path)
+    # get validation batch
+    x_v, y_v = batch.batch(validation_set_path, dictionary_path)
+    print("- Training and validation sets imported.")
     # create model
     model = Sequential()
-    model.add(Dense(INPUT_LAYER_SIZE, input_dim = INPUT_DIM, activation = INPUT_LAYER_ACTIVATION))
-    model.add(Dense(HIDDEN_LAYER_SIZE, activation = HIDDEN_LAYER_ACTIVATION))
-    model.add(Dense(OUTPUT_LAYER_SIZE, activation = OUTPUT_LAYER_ACTIVATION))
-    return model
-
-def evaluate(model, validation_set_path = "../../data/validation_set", dictionary_path = "../../data/dictionary.csv"):
-    X, Y = batch(training_set_path, dictionary_path)
-    # evaluate the model
-    scores = model.evaluate(x, y, batch_size=len(x))
-    print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
-
-def training(training_set_path = "../../data/training_set", dictionary_path = "../../data/dictionary.csv"):
-    model = build_from_scratch()
-    x, y = batch(training_set_path, dictionary_path)
-    # Compile model
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model.add(LSTM(64, return_sequences=True, stateful=False, batch_input_shape = (None, x_t.shape[1], x_t.shape[2])))
+    model.add(LSTM(64, return_sequences=True, stateful=False))
+    model.add(LSTM(64, stateful=False))
+    # add dropout to control for overfitting
+    model.add(Dropout(.25))
+    # squash output onto number of classes in probability space
+    model.add(Dense(classes, activation='softmax'))
+    # compile the model
+    model.compile(loss='categorical_crossentropy', optimizer = 'adam', metrics=['accuracy'])
     # Fit the model
-    model.fit(x, y, epochs=EPOCHS, batch_size=len(x))
-    evaluate(model)
-    return model
-
-def export_model(model, json_model_path = "../../data/model/model.json", hdf5_weights_path = "../../data/model/model.h5"):
+    model.fit(x_t, y_t, epochs = epochs, validation_data=(x_v, y_v))
+    # export model
     # serialize model to JSON
     model_json = model.to_json()
-    with open(json_model_path, "w") as json_file:
+    with open(json_path, "w") as json_file:
         json_file.write(model_json)
     # serialize weights to HDF5
-    model.save_weights(hdf5_weights_path)
-    print("Saved model to disk")
+    model.save_weights(h5_path)
+    print("- Model exported to disk.")
+    return model
 
-def import_model(model, json_model_path = "../../data/model/model.json", hdf5_weights_path = "../../data/model/model.h5"):
+def import_model(json_path = json_path, h5_path = h5_path):
     # load json and create model
-    json_file = open(json_model_path, 'r')
+    json_file = open(json_path, 'r')
     loaded_model_json = json_file.read()
     json_file.close()
     loaded_model = model_from_json(loaded_model_json)
     # load weights into new model
-    loaded_model.load_weights("../../data/model/model.h5")
+    loaded_model.load_weights(h5_path)
+    print("Model loaded from disk.")
     return loaded_model
-    print("Loaded model from disk")
+
+def predict(model, x_path): # should be specified a model an a audio instance
+    x = batch.features(x_path)
+    return np.argmax(model.predict(np.array(x)))
+
+generate_model()
