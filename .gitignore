@@ -1,3 +1,8 @@
-/data/training_set
-/data/validation_set
-/data/dictionary.csv
+/data/training_set/*.wav
+/data/training_set/*.mp3
+/data/validation_set/*.wav
+/data/validation_set/*.mp3
+/data/class_8_files/training_set/*.wav
+/data/class_8_files/validation_set/*.wav
+/data/class_8_files/training_set/*.mp3
+/data/class_8_files/validation_set/*.mp3

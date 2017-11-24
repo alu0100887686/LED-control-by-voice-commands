@@ -19,7 +19,7 @@ NFFT = 512
 nfilt = 40
 num_ceps = 12
 cep_lifter = 22
-n_led_rules = 2
+n_led_rules = 7
 
 def instance(path, label):
     label_to_array = [0] * n_led_rules
