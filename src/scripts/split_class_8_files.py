@@ -36,12 +36,12 @@ while(folder_destination != 0 and folder_destination != 1):
     folder_destination = int(input())
 
 if(folder_destination == 0):
-    audio_files = [f for f in os.listdir(training_set_class_8_path) if f.endswith('.mp3')]
+    audio_files = [f for f in os.listdir(training_set_class_8_path) if f.endswith('.wav')]
     csv_path = training_dictionary_path
     folder_destination = training_set_path
     folder_input = training_set_class_8_path
 else:
-    audio_files = [f for f in os.listdir(validation_set_class_8_path) if f.endswith('.mp3')]
+    audio_files = [f for f in os.listdir(validation_set_class_8_path) if f.endswith('.wav')]
     csv_path = validation_dictionary_path
     folder_destination = validation_set_path
     folder_input = validation_set_class_8_path
