@@ -1,16 +1,9 @@
 import scipy.io.wavfile
 from scipy.fftpack import dct
-import matplotlib.pyplot as plt
-import librosa
 import numpy as np
-from sklearn.preprocessing import LabelEncoder
-from os import listdir
-from os.path import isfile, join
 import glob
 import os
 import pandas as pd
-import pylab
-from keras.utils import np_utils
 
 pre_emphasis = 0.97
 frame_size = 0.025

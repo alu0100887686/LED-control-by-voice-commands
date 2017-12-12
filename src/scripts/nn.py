@@ -69,6 +69,7 @@ def generate_model(training_set_path = training_set_path, validation_set_path = 
     print("- Model exported to disk.")
     return model
 
+
 def import_model(json_path = json_path, h5_path = h5_path):
     # load json and create model
     json_file = open(json_path, 'r')
@@ -80,9 +81,11 @@ def import_model(json_path = json_path, h5_path = h5_path):
     print("Model loaded from disk.")
     return loaded_model
 
+
 def predict(model, x_path): # should be specified a model an a audio instance
     x = batch.features(x_path)
     return np.argmax(model.predict(np.array([x]))) + 1
+
 
 #generate_model()
 #model = import_model()

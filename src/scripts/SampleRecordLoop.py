@@ -44,7 +44,6 @@ while(True):
     else:
         file = validation_set_path + "/" + filename + date + ".wav"
     csv += filename + date + ".wav" + ";" + str(type) + "\n"
-    #n_recording += 1
 
     print("Recording * " + file + " -- #" + str(n_recording))
 
@@ -65,8 +64,6 @@ while(True):
     stream.close()
     p.terminate()
 
-
-
     wf = wave.open(file, 'w')
     wf.setnchannels(CHANNELS)
     wf.setsampwidth(p.get_sample_size(FORMAT))
@@ -80,7 +77,7 @@ while(True):
         print("Continue[Enter], Quit[Q]: ")
         aux = input()
     if aux == 'q':
-        break;
+        break
     n_recording += 1
 
 f=open(csv_path, "a+")
