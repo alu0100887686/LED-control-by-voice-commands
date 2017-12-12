@@ -20,7 +20,6 @@ import sys, os
     5: LED Parpadear
     6: LED Disminuir frecuencia
     7: LED Aumentar frecuencia
-    8: ?? (Instruccion desconocida)
 """
 
 units_first_layer = 64
@@ -84,7 +83,11 @@ def import_model(json_path = json_path, h5_path = h5_path):
 
 def predict(model, x_path): # should be specified a model an a audio instance
     x = batch.features(x_path)
-    return np.argmax(model.predict(np.array([x]))) + 1
+    y = model.predict(np.array([x]))
+    if(np.amax(y) < 0.8): # Undefined order
+        return -1
+    else:
+        return np.argmax(y) + 1
 
 
 #generate_model()

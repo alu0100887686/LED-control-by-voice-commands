@@ -6,3 +6,4 @@
 /data/class_8_files/validation_set/*.wav
 /data/class_8_files/training_set/*.mp3
 /data/class_8_files/validation_set/*.mp3
+/src/scripts/__pycache__/
