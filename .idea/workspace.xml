@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8bb968e8-0945-4a60-a6da-5150dfc78bff" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/data/training_set/Archive.zip" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scripts/input.wav" afterPath="$PROJECT_DIR$/src/scripts/input.wav" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scripts/GUI.py" afterPath="$PROJECT_DIR$/src/scripts/GUI.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
