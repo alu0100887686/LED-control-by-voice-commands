@@ -5,6 +5,7 @@ import nn as nn
 from tkinter import *
 from tkinter import ttk
 from tkinter.filedialog import *
+from datetime import datetime
 
 
 CHUNK = 1024
@@ -16,7 +17,22 @@ WAVE_OUTPUT_FILENAME = "input.wav"
 DATA_OUTPUT_FILENAME = "output.txt"
 DEFAULT_JSON_FILE = '../../data/model/model.json'
 DEFAULT_H5_FILE = '../../data/model/weights.h5'
-DEFAULT_WAV_FOLDER = '../../data/wav'
+PATH = os.path.abspath('')
+DEFAULT_WAV_FOLDER = PATH + '/../../data/training_set'
+TRAINING_SET_PATH = PATH + '/../../data/training_set'
+VALIDATION_SET_PATH = PATH + '/../../data/validation_set'
+TRAINING_DICTIONARY_PATH = TRAINING_SET_PATH + '/training_dictionary.csv'
+VALIDATION_DICTIONARY_PATH = VALIDATION_SET_PATH + '/validation_dictionary.csv'
+CSV_PATH = TRAINING_DICTIONARY_PATH
+COMMANDS = { -1 : '[-1] : Instrucción Desconocida',
+             1 : '[1] : LED Encender',
+             2 : '[2] : LED Apagar',
+             3 : '[3] : LED Cambiar Color',
+             4 : '[4] : LED Permutar Colores',
+             5 : '[5] : LED Parpadear',
+             6 : '[6] : LED Disminuir Frecuencia',
+             7 : '[7] : LED Aumentar Frecuencia'
+             }
 
 
 class GUI:
@@ -33,8 +49,9 @@ class GUI:
 
         # TAB 1
         self.lf_output = LabelFrame(self.tab1, text="Output")
-        self.ent_output = Entry(self.lf_output)
         self.btn_record = Button(self.tab1, text="Record...", command=self.record)
+        self.string_prediction = StringVar(self.root)
+        self.opt_menu_prediction = OptionMenu(self.lf_output, self.string_prediction, *COMMANDS.values())
 
         # TAB 2
         self.lf_train = LabelFrame(self.tab2, text="From Model and Weights")
@@ -54,7 +71,7 @@ class GUI:
         self.lf_class = LabelFrame(self.tab3, text="Class")
         self.ent_class = Entry(self.lf_class)
 
-        self.btn_record_train = Button(self.tab3, text="Record...")
+        self.btn_record_train = Button(self.tab3, text="Record...", command=lambda: self.record(True))
 
         # MODEL
         self.model = nn.import_model(DEFAULT_JSON_FILE, DEFAULT_H5_FILE)
@@ -72,7 +89,7 @@ class GUI:
 
         self.lf_output.pack(fill=X)
         self.btn_record.pack()
-        self.ent_output.pack(fill=X)
+        self.opt_menu_prediction.pack(fill=X)
 
         self.lf_train.pack()
         self.ent_JSON.grid(row=0, column=0)
@@ -108,7 +125,7 @@ class GUI:
     def predict(self):
         self.set_status("Predicting...")
         self.prediction = nn.predict(self.model, WAVE_OUTPUT_FILENAME)
-        self.set_text(self.prediction, self.ent_output)
+        self.string_prediction.set(COMMANDS[self.prediction])
         self.set_status("Prediction calculated")
 
     def train(self):
@@ -116,7 +133,7 @@ class GUI:
         self.model = nn.import_model(self.ent_JSON.get(), self.ent_weights.get())
         self.set_status("Model loaded from disk")
 
-    def record(self):
+    def record(self, training=False):
         self.set_status("Recording...")
         p = pyaudio.PyAudio()
         stream = p.open(format=FORMAT,
@@ -135,13 +152,25 @@ class GUI:
         stream.close()
         p.terminate()
         self.set_status("Finished Recording")
-        wf = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
+        filename = ''
+        if training:
+            date = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+            filename = DEFAULT_WAV_FOLDER + self.ent_prefix.get() + date + ".wav"
+        else:
+            filename = WAVE_OUTPUT_FILENAME
+        wf = wave.open(filename, 'wb')
         wf.setnchannels(CHANNELS)
         wf.setsampwidth(p.get_sample_size(FORMAT))
         wf.setframerate(RATE)
         wf.writeframes(b''.join(frames))
         wf.close()
-        self.predict()
+        if training:
+            self.set_status('Saved at ' + self.ent_prefix.get() + date + ".wav")
+            f = open(CSV_PATH, "a+")
+            f.write(self.ent_prefix.get() + date + ".wav; " + self.ent_class.get() + '\n')
+            f.close()
+        else:
+            self.predict()
 
     def set_text(self, text, entry):
         entry.delete(0, END)
