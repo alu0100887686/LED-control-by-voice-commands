@@ -12,7 +12,7 @@ import time
 import h5py
 import sys, os
 
-""" 8 clases:
+""" 7 clases:
     1: LED Encender
     2: LED Apagar
     3: LED Cambiar color
@@ -22,11 +22,11 @@ import sys, os
     7: LED Aumentar frecuencia
 """
 
-units_first_layer = 64
-units_second_layer = 64
-units_third_layer = 64
+units_first_layer = 128
+units_second_layer = 128
+units_third_layer = 128
 classes = 7
-epochs = 30
+epochs = 40
 path = os.path.abspath('')
 training_set_path = path + '/../../data/training_set'
 validation_set_path = path + '/../../data/validation_set'
@@ -84,7 +84,9 @@ def import_model(json_path = json_path, h5_path = h5_path):
 def predict(model, x_path): # should be specified a model an a audio instance
     x = batch.features(x_path)
     y = model.predict(np.array([x]))
-    if(np.amax(y) < 0.8): # Undefined order
+    print(y)
+    print (np.argmax(y) + 1)
+    if(np.amax(y) < 0.95): # Undefined order
         return -1
     else:
         return np.argmax(y) + 1

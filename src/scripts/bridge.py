@@ -2,6 +2,19 @@
 # -*- coding: iso-8859-1 -*-
 import serial, sys, re, binascii
 import serial.tools.list_ports
+import scipy.io.wavfile as wavfile
+import nn
+import pyaudio
+import wave
+from array import array
+import numpy as np
+
+CHUNK = 1024
+FORMAT = pyaudio.paInt16
+CHANNELS = 2
+RATE = 44100
+RECORD_SECONDS = 3
+WAVE_OUTPUT_FILENAME = "input.wav"
 
 def getSerialPort():
     r = ""
@@ -22,8 +35,44 @@ def getSerialPort():
 
 print (getSerialPort())
 arduino = serial.Serial(getSerialPort(), 9600)
+
+model = nn.import_model()
+
+while(True):
+    print('Recording...')
+    p = pyaudio.PyAudio()
+    stream = p.open(format=FORMAT,
+                    channels=CHANNELS,
+                    rate=RATE,
+                    input=True,
+                    frames_per_buffer=CHUNK)
+    frames = []
+    for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
+        data = stream.read(CHUNK)
+        frames.append(data)
+    stream.stop_stream()
+    stream.close()
+    p.terminate()
+    print('Finished Recording')
+    wf = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
+    wf.setnchannels(CHANNELS)
+    wf.setsampwidth(p.get_sample_size(FORMAT))
+    wf.setframerate(RATE)
+    wf.writeframes(b''.join(frames))
+    wf.close()
+
+    rate, data = wavfile.read(WAVE_OUTPUT_FILENAME)
+    p = 20*np.log10(np.abs(np.fft.rfft(data[:2048, 0])))
+
+    if np.amax(p) > 80:
+        option = str(nn.predict(model, WAVE_OUTPUT_FILENAME))
+        arduino.write(option.encode())
+
+"""
 option = "1"
 while(option != "0" ):
     option = str(input('Enter your input: '))
     arduino.write(option.encode())
+"""
+
 arduino.close()

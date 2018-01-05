@@ -27,7 +27,7 @@ if(folder_destination == 0):
     csv_path = training_dictionary_path
 else:
     csv_path = validation_dictionary_path
-    
+
 print("Enter File Prefix: ")
 filename = input()
 print("Enter Recording Class: ")
