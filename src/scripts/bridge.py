@@ -2,7 +2,7 @@
 # -*- coding: iso-8859-1 -*-
 import serial, sys, re, binascii
 import serial.tools.list_ports
-import scipy.io.wavfile as wavfile
+from scipy.io.wavfile import read
 import nn
 import pyaudio
 import wave
@@ -61,10 +61,12 @@ while(True):
     wf.writeframes(b''.join(frames))
     wf.close()
 
-    rate, data = wavfile.read(WAVE_OUTPUT_FILENAME)
-    p = 20*np.log10(np.abs(np.fft.rfft(data[:2048, 0])))
-
-    if np.amax(p) > 80:
+    samprate, wavdata = read(WAVE_OUTPUT_FILENAME)
+    chunks = np.array_split(wavdata, CHUNK)
+    dbs = 20*np.log10(np.amax(chunks))
+    #maxdb = dbs
+    print(dbs)
+    if dbs > 80:
         option = str(nn.predict(model, WAVE_OUTPUT_FILENAME))
         arduino.write(option.encode())
 

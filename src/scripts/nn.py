@@ -22,11 +22,11 @@ import sys, os
     7: LED Aumentar frecuencia
 """
 
-units_first_layer = 128
-units_second_layer = 128
-units_third_layer = 128
-classes = 7
-epochs = 40
+units_first_layer = 512
+units_second_layer = 512
+units_third_layer = 512
+classes = 8
+epochs = 60
 path = os.path.abspath('')
 training_set_path = path + '/../../data/training_set'
 validation_set_path = path + '/../../data/validation_set'
@@ -44,7 +44,7 @@ def generate_model(training_set_path = training_set_path, validation_set_path = 
     x_t, y_t = batch.batch(training_set_path, training_dictionary_path)
     # get validation batch
     x_v, y_v = batch.batch(validation_set_path, validation_dictionary_path)
-    print("- Training and validation sets imported.")
+    print("- Training and validation sets imported." +  str(x_t.shape))
     # create model
     model = Sequential()
     model.add(LSTM(units_first_layer, return_sequences=True, stateful=False, batch_input_shape = (None, x_t.shape[1], x_t.shape[2])))
@@ -84,9 +84,9 @@ def import_model(json_path = json_path, h5_path = h5_path):
 def predict(model, x_path): # should be specified a model an a audio instance
     x = batch.features(x_path)
     y = model.predict(np.array([x]))
-    print(y)
     print (np.argmax(y) + 1)
-    if(np.amax(y) < 0.95): # Undefined order
+    print (y)
+    if(np.amax(y) < 0.95 or np.argmax(y) == 7): # Undefined order
         return -1
     else:
         return np.argmax(y) + 1

@@ -4,6 +4,7 @@ import numpy as np
 import glob
 import os
 import pandas as pd
+import librosa
 
 pre_emphasis = 0.97
 frame_size = 0.025
@@ -12,7 +13,7 @@ NFFT = 512
 nfilt = 40
 num_ceps = 12
 cep_lifter = 22
-n_led_rules = 7
+n_led_rules = 8
 
 def instance(path, label):
     label_to_array = [0] * n_led_rules
@@ -20,6 +21,7 @@ def instance(path, label):
     return [features(path), label_to_array]
 
 def features(path):
+    """
     # Setup
     # File assumed to be in the same directory
     sample_rate, signal = scipy.io.wavfile.read(path)
@@ -69,6 +71,10 @@ def features(path):
     mfcc *= lift
     filter_banks -= (np.mean(filter_banks, axis=0) + 1e-8)
     mfcc -= (np.mean(mfcc, axis=0) + 1e-8)
+    """
+    wave, sr = librosa.load(path, mono = True, sr = None)
+    wave = wave[::3]
+    mfcc = librosa.feature.mfcc(wave, sr = 16000)
     return mfcc
 
 def batch(db, csv): # Return a audio batch proccesed to be a RNN input implemented in Keras.
