@@ -6,6 +6,8 @@ from tkinter import *
 from tkinter import ttk
 from tkinter.filedialog import *
 from datetime import datetime
+import bridge
+import threading
 
 
 CHUNK = 1024
@@ -43,9 +45,11 @@ class GUI:
         self.tab1 = ttk.Frame(self.tabControl)
         self.tab2 = ttk.Frame(self.tabControl)
         self.tab3 = ttk.Frame(self.tabControl)
+        self.tab4 = ttk.Frame(self.tabControl)
         self.tabControl.add(self.tab1, text='Validation')
         self.tabControl.add(self.tab2, text='Training')
         self.tabControl.add(self.tab3, text='Corpus')
+        self.tabControl.add(self.tab4, text='Arduino')
 
         # TAB 1
         self.lf_output = LabelFrame(self.tab1, text="Output")
@@ -72,6 +76,14 @@ class GUI:
         self.ent_class = Entry(self.lf_class)
 
         self.btn_record_train = Button(self.tab3, text="Record...", command=lambda: self.record(True))
+
+        # TAB 4
+        #self.lf_output2 = LabelFrame(self.tab4, text="Output")
+        self.btn_connect = Button(self.tab4, text="Connect...", command=self.connect)
+        self.btn_disconnect = Button(self.tab4, text="Disconnect...", command=self.disconnect)
+        #self.string_prediction2 = StringVar(self.root)
+        #self.opt_menu_prediction2 = OptionMenu(self.lf_output, self.string_prediction, *COMMANDS.values())
+        self.arduino = None
 
         # MODEL
         self.model = nn.import_model(DEFAULT_JSON_FILE, DEFAULT_H5_FILE)
@@ -110,6 +122,9 @@ class GUI:
 
         self.status_bar.pack(side=BOTTOM, fill=X)
 
+        self.btn_connect.pack()
+        self.btn_disconnect.pack()
+
     def osx_fix(self):
         # a fix for running on OSX - to center the tab title text vertically
         if self.root.tk.call('tk', 'windowingsystem') == 'aqua':  # only for OSX
@@ -132,6 +147,18 @@ class GUI:
         self.set_status("Loading model from disk...")
         self.model = nn.import_model(self.ent_JSON.get(), self.ent_weights.get())
         self.set_status("Model loaded from disk")
+
+    def connect(self):
+        self.set_status("Connecting to Arduino UNO...")
+        self.arduino = bridge.Arduino()
+        if(self.arduino.arduino == None):
+            self.set_status("Error connecting to Arduino UNO...")
+        self.arduino.loop()
+
+    def disconnect(self):
+        if(self.arduino != None):
+            self.arduino.disconnect()
+
 
     def record(self, training=False):
         self.set_status("Recording...")
