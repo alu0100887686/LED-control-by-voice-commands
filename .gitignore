@@ -6,5 +6,10 @@
 /data/class_8_files/validation_set/*.wav
 /data/class_8_files/training_set/*.mp3
 /data/class_8_files/validation_set/*.mp3
+<<<<<<< HEAD
 /src/scripts/__pycache__/
 /src/scripts/*.wav
+=======
+/src/scripts/*.wav
+.idea/
+>>>>>>> 1175122d7b02d00dd8283f986f09b197a2754e6a
